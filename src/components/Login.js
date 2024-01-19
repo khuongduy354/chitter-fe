@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { RESTQuery } from "../helper/restQuery";
+import { Button, Flex } from "antd";
 
 const supabase = createClient(
   process.env.REACT_APP_SUPABASE_URL,
@@ -45,10 +46,9 @@ export function Login({ user, setUser }) {
     getUserData();
   }, []);
   return (
-    <div>
-      <button onClick={(e) => signInGG()}>Sign In</button>;
-      <button onClick={(e) => signOutGG()}>Sign Out</button>;
-      {user && <h1>{user.email}</h1>}
-    </div>
+    <Flex gap="middle" justify="center" align="center">
+      <Button onClick={(e) => signInGG()}>Sign In</Button>
+      <Button onClick={(e) => signOutGG()}>Sign Out</Button>
+    </Flex>
   );
 }

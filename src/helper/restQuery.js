@@ -1,7 +1,17 @@
 const getUser = async () => {
   const res = await fetch(process.env.REACT_APP_REST_URL + "/me/");
   if (res.ok) {
-    return res.json();
+    return await res.json();
+  }
+  return null;
+};
+const searchFriend = async (email) => {
+  const res = await fetch(
+    process.env.REACT_APP_REST_URL + "/user" + "?s=" + email
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data.user;
   }
   return null;
 };
@@ -22,4 +32,4 @@ const signIn = async (accessToken) => {
   return null;
 };
 
-export const RESTQuery = { getUser, signIn };
+export const RESTQuery = { getUser, signIn, searchFriend };

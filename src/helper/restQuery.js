@@ -22,8 +22,8 @@ const signIn = async (accessToken) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: accessToken,
     },
-    body: JSON.stringify({ accessToken }),
   });
   if (res.ok) {
     res = await res.json();
@@ -31,5 +31,72 @@ const signIn = async (accessToken) => {
   }
   return null;
 };
+const addFriend = async (friendId) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/friend/add";
 
-export const RESTQuery = { getUser, signIn, searchFriend };
+  let res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ friendId }),
+  });
+  return res.ok ? true : false;
+};
+const sendFriendRequest = async (friendId, accessToken) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/friend/request";
+  const res = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify({
+      friendId,
+    }),
+    headers: {
+      Authorization: accessToken,
+      "Content-Type": "application/json",
+    },
+  });
+  return res.ok ? true : false;
+};
+const getFriendRequestsReceived = async (accessToken) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/friend/requests/received";
+  const res = await fetch(url, { headers: { Authorization: accessToken } });
+  if (res.ok) {
+    const data = await res.json();
+    return data.friendRequests;
+  }
+  return null;
+};
+
+const acceptFriendRequest = async (accessToken, freq) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/friend/add";
+  const res = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify({
+      friendId: freq.from,
+    }),
+    headers: {
+      Authorization: accessToken,
+      "Content-Type": "application/json",
+    },
+  });
+  return res.ok ? true : false;
+};
+const getFriends = async (accessToken) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/friends";
+  const res = await fetch(url, { headers: { Authorization: accessToken } });
+  if (res.ok) {
+    const data = await res.json();
+    return data.friends;
+  }
+  return null;
+};
+export const RESTQuery = {
+  getUser,
+  signIn,
+  searchFriend,
+  getFriendRequestsReceived,
+  addFriend,
+  sendFriendRequest,
+  acceptFriendRequest,
+  getFriends,
+};

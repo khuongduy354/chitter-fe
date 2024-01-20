@@ -34,6 +34,7 @@ export function Login({ user, setUser }) {
           .access_token;
         const _user = await RESTQuery.signIn(access_token);
         if (_user) {
+          _user.accessToken = access_token;
           setUser(_user);
         } else {
           setUser(null);

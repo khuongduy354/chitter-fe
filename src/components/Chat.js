@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { getSocket } from "../helper/socket";
 import { RESTQuery } from "../helper/restQuery";
-import { Button, Divider, Flex } from "antd";
+import { Button, Divider, Flex, message } from "antd";
 
 export const Chat = ({ user }) => {
   const searchRef = useRef(null);
   const sendMsgRef = useRef(null);
 
   const [searchedUsers, setSearchedUsers] = useState([]);
+  const [messageApi, contextHolder] = message.useMessage();
   const [friends, setFriends] = useState([]);
   const [currChatFriend, setCurrChatFriend] = useState(null);
+  const [friendRequests, setFriendRequests] = useState([]);
   const [chatContent, setChatContent] = useState([]);
 
   useEffect(() => {
@@ -21,8 +23,37 @@ export const Chat = ({ user }) => {
   }, [chatContent]);
 
   useEffect(() => {}, [currChatFriend]);
+  useEffect(() => {
+    async function getFriends() {
+      const friends = await RESTQuery.getFriends(user.accessToken);
+      console.log(friends);
+      if (friends) setFriends(friends);
+    }
+    getFriends();
+  }, []);
+  useEffect(() => {
+    async function getFriendRequests() {
+      const friendRequests = await RESTQuery.getFriendRequestsReceived(
+        user.accessToken
+      );
+      if (friendRequests) setFriendRequests(friendRequests);
+    }
+    getFriendRequests();
+  }, []);
 
   //helpers funcs
+  const info = (data) => {
+    messageApi.info(data);
+  };
+  const addFriendRequest = async (friend) => {
+    if (friends.find((f) => f.id === friend.id)) return;
+    const isOk = await RESTQuery.sendFriendRequest(friend.id, user.accessToken);
+    if (isOk) {
+      info("Friend request sent");
+    } else {
+      info("Friend request failed");
+    }
+  };
   const searchHandler = async () => {
     const newUser = await RESTQuery.searchFriend(searchRef.current.value);
     if (newUser) {
@@ -84,18 +115,73 @@ export const Chat = ({ user }) => {
   };
   const FriendList = () => {
     return (
-      <ul>
-        {friends.map((friend, idx) => {
-          <li key={idx}>
-            {friend.email}
-            <span> </span>
-            <Button onClick={() => setCurrChatFriend(friend)}>Chat</Button>
-          </li>;
-        })}
-      </ul>
+      <div>
+        {friends.length > 0 && <Divider>Friends</Divider>}
+        <ul>
+          {friends.map((friend, idx) => {
+            return (
+              <li key={idx}>
+                {friend.email}
+                <span> </span>
+                <Button onClick={() => setCurrChatFriend(friend)}>Chat</Button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     );
   };
   const UserPanel = () => {
+    const acceptFriend = async (freq) => {
+      const isOk = await RESTQuery.acceptFriendRequest(user.accessToken, freq);
+      if (isOk) {
+        info("Friend request accepted!");
+      } else {
+        info("Friend request accept failed");
+      }
+    };
+    const FriendRequestList = () => {
+      return (
+        <div>
+          {friendRequests.length > 0 && <Divider>Friend Requests</Divider>}
+          <ul style={{ listStyle: "none" }}>
+            {friendRequests.map((freq, idx) => {
+              return (
+                <li key={idx}>
+                  {freq.from}
+                  <span> </span>
+                  <Button onClick={() => acceptFriend(freq)}>Accept</Button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    };
+    const SearchBar = () => {
+      return (
+        <div>
+          {searchedUsers.length > 0 && <Divider>Search Results</Divider>}
+          <ul>
+            {searchedUsers &&
+              searchedUsers.map((friend) => {
+                return (
+                  <li key={friend.id}>
+                    {friend.email} - {friend.name}
+                    <span> </span>
+                    <Button onClick={() => setCurrChatFriend(friend)}>
+                      Chat
+                    </Button>
+                    <Button onClick={() => addFriendRequest(friend)}>
+                      Request to add friend
+                    </Button>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      );
+    };
     return (
       <div>
         <h2>User: {user.email}</h2>
@@ -110,22 +196,9 @@ export const Chat = ({ user }) => {
             Search
           </Button>
 
-          <ul>
-            {searchedUsers &&
-              searchedUsers.map((friend) => {
-                return (
-                  <li key={friend.id}>
-                    {friend.email} - {friend.name}
-                    <span> </span>
-                    <Button onClick={() => setCurrChatFriend(friend)}>
-                      Chat
-                    </Button>
-                  </li>
-                );
-              })}
-          </ul>
-
+          <SearchBar />
           <FriendList />
+          <FriendRequestList />
         </div>
       </div>
     );
@@ -133,6 +206,7 @@ export const Chat = ({ user }) => {
 
   return (
     <div>
+      {contextHolder}
       <Flex justify="space-around">
         <UserPanel />
         {currChatFriend && <ChatPanel />}

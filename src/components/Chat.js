@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { getSocket } from "../helper/socket";
 import { RESTQuery } from "../helper/restQuery";
-import { Button, Divider, Flex, message } from "antd";
+import { Button, Divider, Flex, Input, message } from "antd";
+import { ChatPanel } from "./ChatPanel";
 
 export const Chat = ({ user }) => {
   const searchRef = useRef(null);
-  const sendMsgRef = useRef(null);
 
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [messageApi, contextHolder] = message.useMessage();
@@ -13,6 +13,8 @@ export const Chat = ({ user }) => {
   const [currChatFriend, setCurrChatFriend] = useState(null);
   const [friendRequests, setFriendRequests] = useState([]);
   const [chatContent, setChatContent] = useState([]);
+  const [searchedGroups, setSearchedGroups] = useState([]);
+  const [myGroups, setMyGroups] = useState([]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -22,11 +24,9 @@ export const Chat = ({ user }) => {
     });
   }, [chatContent]);
 
-  useEffect(() => {}, [currChatFriend]);
   useEffect(() => {
     async function getFriends() {
       const friends = await RESTQuery.getFriends(user.accessToken);
-      console.log(friends);
       if (friends) setFriends(friends);
     }
     getFriends();
@@ -64,55 +64,8 @@ export const Chat = ({ user }) => {
       alert("No user found");
     }
   };
-  const sendMsg = () => {
-    const socket = getSocket();
-    if (chatContent != null)
-      socket.emit(
-        "userChat",
-        user.id,
-        currChatFriend.id,
-        sendMsgRef.current.value
-      );
-    sendMsgRef.current.value = "";
-  };
 
   //components
-  const ChatPanel = () => {
-    return (
-      <Flex className="RightBar" vertical justify="space-between">
-        <h3>Chat with {currChatFriend.email}</h3>
-        <ul style={{ listStyle: "none" }}>
-          {chatContent.map((msg, idx) => {
-            return (
-              <li key={idx}>
-                <Flex
-                  justify={msg.from === user.id ? "flex-end" : "flex-start"}
-                >
-                  <span
-                    style={{
-                      backgroundColor: msg.from === user.id ? "blue" : "black",
-                      padding: 10,
-                      borderRadius: 20,
-                      color: "white",
-                      margin: 5,
-                    }}
-                  >
-                    {msg.content}
-                  </span>
-                </Flex>
-              </li>
-            );
-          })}
-        </ul>
-        <div className="msgSender">
-          <input ref={sendMsgRef} type="text" />
-          <Button type="primary" onClick={sendMsg}>
-            Send
-          </Button>
-        </div>
-      </Flex>
-    );
-  };
   const FriendList = () => {
     return (
       <div>
@@ -203,13 +156,89 @@ export const Chat = ({ user }) => {
       </div>
     );
   };
+  const groupInput = useRef(null);
+  const createGroup = async () => {
+    const room = await RESTQuery.createGroup(
+      user.accessToken,
+      groupInput.current.value
+    );
+    if (room) {
+      info("Group created");
+    } else {
+      info("Group creation failed");
+    }
+  };
+  const searchGroup = async () => {
+    const groups = await RESTQuery.searchGroups(groupInput.current.value);
+    if (groups) setSearchedGroups(groups);
+  };
+  const joinGroup = async (gr) => {
+    const joined = await RESTQuery.joinGroup(user.accessToken, gr.name);
+    if (joined) {
+      info("Joined group");
+    } else {
+      info("Join group failed");
+    }
+  };
+  useEffect(() => {
+    async function getMyGroups() {
+      const myGroups = await RESTQuery.getMyGroups(user.accessToken);
+      if (myGroups) setMyGroups(myGroups);
+    }
+    getMyGroups();
+  }, []);
+
+  const GroupPanel = () => {
+    return (
+      <div>
+        <input ref={groupInput} />
+        <Button onClick={createGroup}>Create Group</Button>
+        <Button onClick={searchGroup}>Search Group</Button>
+
+        {searchedGroups.length > 0 && (
+          <div>
+            <Divider>Search Results</Divider>
+            <ul>
+              {searchedGroups.map((gr, idx) => (
+                <li key={idx}>
+                  {gr.name} - {gr.id}
+                  <Button onClick={() => joinGroup(gr)}>Chat</Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {myGroups.length > 0 && <Divider>My Groups</Divider>}
+        <ul>
+          {myGroups.map((gr, idx) => (
+            <li key={idx}>
+              {gr.name}
+              <span> </span>
+              <Button>Chat</Button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
   return (
     <div>
       {contextHolder}
       <Flex justify="space-around">
-        <UserPanel />
-        {currChatFriend && <ChatPanel />}
+        <div>
+          <UserPanel />
+          <GroupPanel />
+        </div>
+
+        {currChatFriend && (
+          <ChatPanel
+            user={user}
+            currChatFriend={currChatFriend}
+            chatContent={chatContent}
+          />
+        )}
       </Flex>
     </div>
   );

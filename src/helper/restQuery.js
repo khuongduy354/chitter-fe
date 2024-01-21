@@ -90,7 +90,77 @@ const getFriends = async (accessToken) => {
   }
   return null;
 };
+const getRoom = async (accessToken, friendId) => {
+  const url = process.env.REACT_APP_REST_URL + "/room/oneone";
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: accessToken,
+      "Content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({ friendId }),
+  });
+  if (res.ok) {
+    let data = await res.json();
+    return data.room;
+  }
+  return null;
+};
+
+const createGroup = async (accessToken, groupName) => {
+  const url = process.env.REACT_APP_REST_URL + "/room/group/create";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: accessToken,
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({
+      groupName,
+    }),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return data.room;
+  }
+  return null;
+};
+const joinGroup = async (accessToken, groupId) => {
+  const url = process.env.REACT_APP_REST_URL + "/room/group/join";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: accessToken,
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({
+      groupId,
+    }),
+  });
+  return res.ok;
+};
+
+const searchGroups = async (groupName) => {
+  const url = process.env.REACT_APP_REST_URL + "/room/groups?s=" + groupName;
+  const res = await fetch(url);
+  if (res.ok) {
+    const data = await res.json();
+    return data.room;
+  }
+  return null;
+};
+const getMyGroups = async (accessToken) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/groups";
+  const res = await fetch(url, { headers: { Authorization: accessToken } });
+  if (res.ok) {
+    const data = await res.json();
+    return data.rooms;
+  }
+  return null;
+};
 export const RESTQuery = {
+  getRoom,
   getUser,
   signIn,
   searchFriend,
@@ -99,4 +169,8 @@ export const RESTQuery = {
   sendFriendRequest,
   acceptFriendRequest,
   getFriends,
+  createGroup,
+  joinGroup,
+  searchGroups,
+  getMyGroups,
 };

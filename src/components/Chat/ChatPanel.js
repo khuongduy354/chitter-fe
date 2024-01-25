@@ -1,15 +1,29 @@
-import { useEffect, useRef, useState } from "react";
-import { RESTQuery } from "../helper/restQuery";
-import { getSocket } from "../helper/socket";
+import { useContext, useEffect, useRef, useState } from "react";
+import { RESTQuery } from "../../helper/restQuery";
+import { getSocket } from "../../helper/socket";
 import { Button, Flex } from "antd";
+import { AppContext } from "../../App";
+import { ChatContext } from "./Chat";
 
-export const ChatPanel = ({ user, currChatFriend, chatContent }) => {
-  const [room, setRoom] = useState(null);
+export const ChatPanel = () => {
+  const { currChatFriend } = useContext(ChatContext);
+  const { user } = useContext(AppContext);
+
   const sendMsgRef = useRef(null);
+  const [chatContent, setChatContent] = useState([]);
+  const [room, setRoom] = useState(null); // use this for theme
+
+  useEffect(() => {
+    const socket = getSocket();
+    socket.emit("initConnection", user.id);
+    socket.on("userChatReceive", ({ content, from }) => {
+      setChatContent([...chatContent, { content, from }]);
+    });
+  }, [chatContent]);
+
   useEffect(() => {
     async function getRoom() {
       const _r = await RESTQuery.getRoom(user.accessToken, currChatFriend.id);
-      console.log(_r);
       if (_r) setRoom(_r);
     }
     if (currChatFriend) getRoom();
@@ -28,7 +42,8 @@ export const ChatPanel = ({ user, currChatFriend, chatContent }) => {
   };
   return (
     <Flex className="RightBar" vertical justify="space-between">
-      <h3>Chat with {currChatFriend.email}</h3>
+      <h3>Chatting with {currChatFriend.email}</h3>
+
       <ul style={{ listStyle: "none" }}>
         {chatContent.map((msg, idx) => {
           return (
@@ -50,6 +65,7 @@ export const ChatPanel = ({ user, currChatFriend, chatContent }) => {
           );
         })}
       </ul>
+
       <div className="msgSender">
         <input ref={sendMsgRef} type="text" />
         <Button type="primary" onClick={sendMsg}>

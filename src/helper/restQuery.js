@@ -159,6 +159,41 @@ const getMyGroups = async (accessToken) => {
   }
   return null;
 };
+
+const getMyEmojis = async (accessToken) => {
+  const url = process.env.REACT_APP_REST_URL + "/me/emojis";
+  const res = await fetch(url, {
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return data.emojis;
+  }
+  return null;
+};
+const deleteEmoji = async (accessToken, emojiId) => {
+  const url = process.env.REACT_APP_REST_URL + "/emojis/" + emojiId;
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+  return res.ok;
+};
+const uploadEmoji = async (accessToken, formdata) => {
+  const url = process.env.REACT_APP_REST_URL + "/emoji";
+  const res = await fetch(url, {
+    body: formdata,
+    method: "POST",
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+  return res.ok;
+};
 export const RESTQuery = {
   getRoom,
   getUser,
@@ -173,4 +208,7 @@ export const RESTQuery = {
   joinGroup,
   searchGroups,
   getMyGroups,
+  uploadEmoji,
+  getMyEmojis,
+  deleteEmoji,
 };

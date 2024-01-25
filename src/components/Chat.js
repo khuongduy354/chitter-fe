@@ -4,7 +4,7 @@ import { RESTQuery } from "../helper/restQuery";
 import { Button, Divider, Flex, Input, message } from "antd";
 import { ChatPanel } from "./ChatPanel";
 
-export const Chat = ({ user }) => {
+export const Chat = ({ user, setPanelMode }) => {
   const searchRef = useRef(null);
 
   const [searchedUsers, setSearchedUsers] = useState([]);
@@ -240,6 +240,8 @@ export const Chat = ({ user }) => {
           />
         )}
       </Flex>
+      <Button onClick={() => setPanelMode("emoji")}>Emoji Panel</Button>
+      <Button onClick={() => setPanelMode("theme")}>Theme Panel</Button>
     </div>
   );
 };

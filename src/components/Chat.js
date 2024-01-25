@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { getSocket } from "../helper/socket";
 import { RESTQuery } from "../helper/restQuery";
 import { Button, Divider, Flex, Input, message } from "antd";
 import { ChatPanel } from "./ChatPanel";
+import { AppContext } from "../App";
 
-export const Chat = ({ user, setPanelMode }) => {
+export const Chat = () => {
+  const { user, setPanelMode } = useContext(AppContext);
   const searchRef = useRef(null);
 
   const [searchedUsers, setSearchedUsers] = useState([]);

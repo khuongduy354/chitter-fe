@@ -1,9 +1,11 @@
 import { Button, Divider } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FileUploadComponent } from "./FileUpload";
 import { RESTQuery } from "../helper/restQuery";
+import { AppContext } from "../App";
 
-export const EmojiPanel = ({ user, setPanelMode }) => {
+export const EmojiPanel = () => {
+  const { user, setPanelMode } = useContext(AppContext);
   const [emojis, setEmojis] = useState([]);
   useEffect(() => {
     async function getEmojis() {

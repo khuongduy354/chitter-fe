@@ -1,14 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RESTQuery } from "../helper/restQuery";
 import { Button, Flex } from "antd";
+import { AppContext } from "../App";
 
 const supabase = createClient(
   process.env.REACT_APP_SUPABASE_URL,
   process.env.REACT_APP_SUPABASE_ANON_KEY
 );
 
-export function Login({ user, setUser }) {
+export function Login() {
+  const { user, setUser } = useContext(AppContext);
   const signOutGG = async () => {
     let { data, error } = await supabase.auth.signOut();
     if (!error) setUser(null);

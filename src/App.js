@@ -1,24 +1,25 @@
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { Chat } from "./components/Chat";
 import { Login } from "./components/Login";
 import { EmojiPanel } from "./components/EmojiPanel";
 
+export const AppContext = createContext();
 function App() {
   const [user, setUser] = useState(null);
   const [panelMode, setPanelMode] = useState("chat"); // chat || emoji | theme
   return (
-    <div>
+    <AppContext.Provider value={{ user, panelMode, setPanelMode, setUser }}>
       {!user ? (
-        <Login user={user} setUser={setUser} />
+        <Login />
       ) : panelMode == "chat" ? (
-        <Chat user={user} setPanelMode={setPanelMode} />
+        <Chat />
       ) : panelMode == "emoji" ? (
-        <EmojiPanel user={user} setPanelMode={setPanelMode} />
+        <EmojiPanel />
       ) : (
         // <ThemePanel />
         <div>Theme Panel</div>
       )}
-    </div>
+    </AppContext.Provider>
   );
 }
 

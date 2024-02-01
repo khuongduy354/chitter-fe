@@ -7,17 +7,17 @@ import { AppContext } from "../App";
 export const EmojiPanel = () => {
   const { user, setPanelMode } = useContext(AppContext);
   const [emojis, setEmojis] = useState([]);
+  async function getEmojis() {
+    const emojis = await RESTQuery.getMyEmojis(user.accessToken);
+    if (emojis) setEmojis(emojis);
+  }
   useEffect(() => {
-    async function getEmojis() {
-      const emojis = await RESTQuery.getMyEmojis(user.accessToken);
-      if (emojis) setEmojis(emojis);
-    }
     getEmojis();
   }, []);
   const deleteEmoji = async (emo) => {
     const isOk = await RESTQuery.deleteEmoji(user.accessToken, emo.id);
     if (isOk) {
-      setEmojis(emojis.filter((e) => e.id !== emo.id));
+      getEmojis();
       alert("Delete success");
     } else {
       alert("Delete failed");
@@ -32,6 +32,7 @@ export const EmojiPanel = () => {
     const isOk = await RESTQuery.uploadEmoji(user.accessToken, formdata);
     if (isOk) {
       alert("Upload success");
+      getEmojis();
     } else {
       alert("Upload failed");
     }
@@ -43,13 +44,16 @@ export const EmojiPanel = () => {
         <div>
           <Divider>My Emojis</Divider>
           <ul>
-            {emojis.map((emoji, idx) => (
-              <li key={idx}>
-                {emoji.name}
-                <span> </span>
-                <Button onClick={() => deleteEmoji(emoji)}>Delete</Button>
-              </li>
-            ))}
+            {emojis.map((emoji, idx) => {
+              console.log(emoji);
+              return (
+                <li key={idx}>
+                  <img width="16" height="16" src={emoji.img_url} />
+                  <span> </span>
+                  <Button onClick={() => deleteEmoji(emoji)}>Delete</Button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { Chat } from "./components/Chat/Chat";
 import { Login } from "./components/Login";
 import { EmojiPanel } from "./components/EmojiPanel";
-import { ThemeEditor } from "./components/ThemeEditor";
+import { ThemeEditor } from "./components/Theme/ThemeEditor";
 
 export const AppContext = createContext({
   user: null,

@@ -39,7 +39,7 @@ export const ParallaxBackground = ({ bgColor, dividerProps, layers }) => {
           backgroundColor: bgColor,
         }}
       >
-        {[...new Array(10)].map((_, i) => (
+        {[...new Array(1)].map((_, i) => (
           <div key={i}>
             <ParallaxChunk layers={layers} />
             <div

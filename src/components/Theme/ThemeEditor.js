@@ -209,7 +209,7 @@ export const ThemeEditor = () => {
   return (
     <div>
       <Flex>
-        <div style={{ maxWidth: "50%" }}>
+        <div>
           <GeneralSettings {...GeneralSettingsProps} />
           <LayersSettings {...LayersSettingsProps} />
         </div>

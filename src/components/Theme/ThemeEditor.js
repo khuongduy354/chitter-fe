@@ -1,7 +1,9 @@
 import { Button, Divider, Flex, Input, List } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { ParallaxBackground } from "./ParallaxBackground";
 import { defaultChatTheme } from "../../helper/chatTheme";
+import { RESTQuery } from "../../helper/restQuery";
+import { AppContext } from "../../App";
 
 const GeneralSettings = ({
   bgColor,
@@ -66,6 +68,7 @@ const LayersSettings = ({ layers, setLayers }) => {
     <div>
       <Divider>Current Layers</Divider>
       <Button
+        type="primary"
         onClick={() => {
           setLayers([
             ...layers,
@@ -90,11 +93,13 @@ const LayersSettings = ({ layers, setLayers }) => {
                         ...layers.slice(index + 1),
                       ]);
                     }}
+                    type="primary"
                   >
                     Enable
                   </Button>
                 ) : (
                   <Button
+                    type="primary"
                     onClick={() => {
                       setLayers([
                         ...layers.slice(0, index),
@@ -178,6 +183,7 @@ const LayersSettings = ({ layers, setLayers }) => {
                         ...layers.slice(index + 1),
                       ]);
                     }}
+                    type="primary"
                   >
                     Delete Layer
                   </Button>
@@ -199,6 +205,27 @@ export const ThemeEditor = () => {
     defaultChatTheme.layers.map((l) => ({ ...l, enable: true }))
   );
 
+  const [themeName, setThemeName] = useState("Untitled");
+
+  const { user } = useContext(AppContext);
+  const saveTheme = async () => {
+    const theme = {
+      bgColor,
+      dividerProps,
+      layers: layers.map((l) => ({ ...l, enable: true })),
+    };
+    const isOk = await RESTQuery.createTheme(
+      user.accessToken,
+      theme,
+      themeName
+    );
+    if (isOk) {
+      alert("Theme saved!");
+    } else {
+      alert("Failed to save theme");
+    }
+  };
+
   const GeneralSettingsProps = {
     bgColor,
     setBgColor,
@@ -210,6 +237,16 @@ export const ThemeEditor = () => {
     <div>
       <Flex>
         <div>
+          <Divider>Theme Name</Divider>
+          <Input
+            value={themeName}
+            onChange={(e) => {
+              setThemeName(e.target.value);
+            }}
+          />
+          <Button type="primary" onClick={saveTheme}>
+            Save Theme
+          </Button>
           <GeneralSettings {...GeneralSettingsProps} />
           <LayersSettings {...LayersSettingsProps} />
         </div>

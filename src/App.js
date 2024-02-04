@@ -32,7 +32,7 @@ function App() {
   };
   return (
     <div>
-      <ChatPanel />
+      <ThemeEditor />
     </div>
   );
 }

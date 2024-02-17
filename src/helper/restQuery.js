@@ -195,14 +195,18 @@ const uploadEmoji = async (accessToken, formdata) => {
   return res.ok;
 };
 
-const createTheme = async (accessToken, theme, themeName) => {
-  const url = process.env.REACT_APP_REST_URL + "/me/themes/create";
+const createTheme = async (accessToken, theme) => {
+  const url = process.env.REACT_APP_REST_URL + "/theme";
   const res = await fetch(url, {
     method: "POST",
     headers: { Authorization: accessToken, "Content-type": "application/json" },
-    body: JSON.stringify({ theme, themeName }),
+    body: JSON.stringify({ theme }),
   });
-  return res.ok;
+  if (res.ok) {
+    const data = await res.json();
+    return data.theme;
+  }
+  return null;
 };
 export const RESTQuery = {
   getRoom,

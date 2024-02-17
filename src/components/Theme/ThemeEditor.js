@@ -64,6 +64,7 @@ const GeneralSettings = ({
 };
 
 const LayersSettings = ({ layers, setLayers }) => {
+  const uploadFile = (files) => {};
   return (
     <div>
       <Divider>Current Layers</Divider>
@@ -72,7 +73,12 @@ const LayersSettings = ({ layers, setLayers }) => {
         onClick={() => {
           setLayers([
             ...layers,
-            { translateY: [0, 0], margin: "0 0 0 0", imgUrl: "" },
+            {
+              translateYMin: 0,
+              translateYMax: 0,
+              margin: "0 0 0 0",
+              imgUrl: "",
+            },
           ]);
         }}
       >
@@ -142,17 +148,14 @@ const LayersSettings = ({ layers, setLayers }) => {
                   />
                   <label>Translate Y minimum</label>
                   <Input
-                    type="text"
-                    value={layer.translateY[0]}
+                    type="number"
+                    value={layer.translateYMin}
                     onChange={(e) => {
                       setLayers([
                         ...layers.slice(0, index),
                         {
                           ...layer,
-                          translateY: [
-                            parseInt(e.target.value),
-                            layer.translateY[1],
-                          ],
+                          translateYMin: parseInt(e.target.value),
                         },
                         ...layers.slice(index + 1),
                       ]);
@@ -160,17 +163,14 @@ const LayersSettings = ({ layers, setLayers }) => {
                   />
                   <label>Translate Y maximum</label>
                   <Input
-                    type="text"
-                    value={layer.translateY[1]}
+                    type="number"
+                    value={layer.translateYMax}
                     onChange={(e) => {
                       setLayers([
                         ...layers.slice(0, index),
                         {
                           ...layer,
-                          translateY: [
-                            layer.translateY[0],
-                            parseInt(e.target.value),
-                          ],
+                          translateYMax: parseInt(e.target.value),
                         },
                         ...layers.slice(index + 1),
                       ]);
@@ -197,29 +197,34 @@ const LayersSettings = ({ layers, setLayers }) => {
   );
 };
 export const ThemeEditor = () => {
-  const [bgColor, setBgColor] = useState(defaultChatTheme.bgColor);
-  const [dividerProps, setDividerProps] = useState(
-    defaultChatTheme.dividerProps
-  );
+  const [bgColor, setBgColor] = useState(defaultChatTheme.bg.bgColor);
+  const [dividerProps, setDividerProps] = useState(defaultChatTheme.bg.divider);
   const [layers, setLayers] = useState(
-    defaultChatTheme.layers.map((l) => ({ ...l, enable: true }))
+    defaultChatTheme.bg.layers.map((l) => ({ ...l, enable: true }))
+  );
+  const [themeName, setThemeName] = useState(defaultChatTheme.themeName);
+  const [senderMsgColor, setSenderMsgColor] = useState(
+    defaultChatTheme.sender_msg_color
+  );
+  const [receiverMsgColor, setReceiverMsgColor] = useState(
+    defaultChatTheme.receiver_msg_color
   );
 
-  const [themeName, setThemeName] = useState("Untitled");
-
-  const { user } = useContext(AppContext);
+  const { user, setPanelMode } = useContext(AppContext);
   const saveTheme = async () => {
+    // remove enable key from layers
+    const _layers = layers.map((l) => {
+      const { enable, ...rest } = l;
+      return rest;
+    });
     const theme = {
-      bgColor,
-      dividerProps,
-      layers: layers.map((l) => ({ ...l, enable: true })),
+      bg: { bgColor, layers: _layers, divider: dividerProps },
+      sender_msg_color: senderMsgColor,
+      receiver_msg_color: receiverMsgColor,
+      themeName,
     };
-    const isOk = await RESTQuery.createTheme(
-      user.accessToken,
-      theme,
-      themeName
-    );
-    if (isOk) {
+    const newTheme = await RESTQuery.createTheme(user.accessToken, theme);
+    if (newTheme) {
       alert("Theme saved!");
     } else {
       alert("Failed to save theme");
@@ -237,6 +242,13 @@ export const ThemeEditor = () => {
     <div>
       <Flex>
         <div>
+          <Button
+            onClick={() => {
+              setPanelMode("chat");
+            }}
+          >
+            Back to user
+          </Button>
           <Divider>Theme Name</Divider>
           <Input
             value={themeName}

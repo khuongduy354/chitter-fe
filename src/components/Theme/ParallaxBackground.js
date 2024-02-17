@@ -12,7 +12,9 @@ const ParallaxChunk = ({ layers }) => {
         return (
           <Fragment key={index}>
             {layer.enable && (
-              <ParallaxBannerLayer translateY={layer.translateY}>
+              <ParallaxBannerLayer
+                translateY={[layer.translateYMin, layer.translateYMax]}
+              >
                 <img
                   src={layer.imgUrl}
                   style={{
@@ -30,16 +32,22 @@ const ParallaxChunk = ({ layers }) => {
     </ParallaxBanner>
   );
 };
-export const ParallaxBackground = ({ bgColor, dividerProps, layers }) => {
+export const ParallaxBackground = ({
+  style,
+  bgColor,
+  dividerProps,
+  layers,
+}) => {
   return (
     <ParallaxProvider>
       <div
         style={{
           width: "100%",
           backgroundColor: bgColor,
+          ...style,
         }}
       >
-        {[...new Array(1)].map((_, i) => (
+        {[...new Array(10)].map((_, i) => (
           <div key={i}>
             <ParallaxChunk layers={layers} />
             <div

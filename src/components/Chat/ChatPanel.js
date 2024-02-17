@@ -35,7 +35,7 @@ export const ChatPanel = () => {
       const _r = await RESTQuery.getRoom(user.accessToken, currChatFriend.id);
       if (_r) {
         setRoom(_r);
-        setChatTheme(_r.theme);
+        if (_r.theme) setChatTheme(_r.theme);
       }
     }
     if (currChatFriend) getRoom();
@@ -54,33 +54,54 @@ export const ChatPanel = () => {
   };
   return (
     <div>
-      {chatTheme && <ParallaxBackground {...chatTheme} />}
-      <Flex className="RightBar" vertical justify="space-between">
+      <Flex
+        className="RightBar"
+        vertical
+        align="space-between"
+        justify="space-between"
+        style={{ height: "90vh" }}
+      >
         <h3>Chatting with {currChatFriend && currChatFriend.email}</h3>
 
-        <ul style={{ listStyle: "none" }}>
-          {chatContent.map((msg, idx) => {
-            return (
-              <li key={idx}>
-                <Flex
-                  justify={msg.from === user.id ? "flex-end" : "flex-start"}
-                >
-                  <span
-                    style={{
-                      backgroundColor: msg.from === user.id ? "blue" : "black",
-                      padding: 10,
-                      borderRadius: 20,
-                      color: "white",
-                      margin: 5,
-                    }}
+        <div style={{ overflow: "scroll" }}>
+          {chatTheme && (
+            <ParallaxBackground
+              style={{
+                position: "absolute",
+                zIndex: -1,
+                maxWidth: "50%",
+                top: 0,
+                maxHeight: "100vh",
+                overflow: "scroll",
+              }}
+              {...chatTheme}
+            />
+          )}
+          <ul style={{ listStyle: "none" }}>
+            {chatContent.map((msg, idx) => {
+              return (
+                <li key={idx}>
+                  <Flex
+                    justify={msg.from === user.id ? "flex-end" : "flex-start"}
                   >
-                    {msg.content}
-                  </span>
-                </Flex>
-              </li>
-            );
-          })}
-        </ul>
+                    <span
+                      style={{
+                        backgroundColor:
+                          msg.from === user.id ? "blue" : "black",
+                        padding: 10,
+                        borderRadius: 20,
+                        color: "white",
+                        margin: 5,
+                      }}
+                    >
+                      {msg.content}
+                    </span>
+                  </Flex>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         <div className="msgSender">
           <input ref={sendMsgRef} type="text" />

@@ -4,17 +4,13 @@ import { RESTQuery } from "../helper/restQuery";
 import { Button, Flex } from "antd";
 import { AppContext } from "../App";
 
-const supabase = createClient(
+export const supabase = createClient(
   process.env.REACT_APP_SUPABASE_URL,
   process.env.REACT_APP_SUPABASE_ANON_KEY
 );
 
 export function Login() {
   const { user, setUser } = useContext(AppContext);
-  const signOutGG = async () => {
-    let { data, error } = await supabase.auth.signOut();
-    if (!error) setUser(null);
-  };
   const signInGG = async () => {
     let { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -51,7 +47,6 @@ export function Login() {
   return (
     <Flex gap="middle" justify="center" align="center">
       <Button onClick={(e) => signInGG()}>Sign In</Button>
-      <Button onClick={(e) => signOutGG()}>Sign Out</Button>
     </Flex>
   );
 }

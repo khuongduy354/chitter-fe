@@ -208,6 +208,22 @@ const createTheme = async (accessToken, theme) => {
   }
   return null;
 };
+const getMessages = async (accessToken, roomId) => {
+  const url = process.env.REACT_APP_REST_URL + "/room/msg";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: accessToken,
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({ roomId }),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return data.messages;
+  }
+  return null;
+};
 export const RESTQuery = {
   getRoom,
   getUser,
@@ -227,4 +243,6 @@ export const RESTQuery = {
   deleteEmoji,
 
   createTheme,
+
+  getMessages,
 };

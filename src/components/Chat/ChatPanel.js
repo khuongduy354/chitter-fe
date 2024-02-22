@@ -16,7 +16,7 @@ export const ChatPanel = () => {
   const [room, setRoom] = useState(null); // use this for theme
   const [chatTheme, setChatTheme] = useState({
     ...defaultChatTheme,
-    layers: defaultChatTheme.layers.map((l) => ({ ...l, enable: true })),
+    layers: defaultChatTheme.bg.layers.map((l) => ({ ...l, enable: true })),
   });
 
   useEffect(() => {
@@ -40,6 +40,16 @@ export const ChatPanel = () => {
     }
     if (currChatFriend) getRoom();
   }, [currChatFriend]);
+
+  useEffect(() => {
+    async function getMsgs() {
+      const msgs = await RESTQuery.getMessages(user.accessToken, room.id);
+      if (msgs) {
+        setChatContent(msgs);
+      }
+    }
+    if (room) getMsgs();
+  }, [room]);
 
   const sendMsg = () => {
     const socket = getSocket();
@@ -74,7 +84,7 @@ export const ChatPanel = () => {
                 maxHeight: "100vh",
                 overflow: "scroll",
               }}
-              {...chatTheme}
+              bg={chatTheme.bg}
             />
           )}
           <ul style={{ listStyle: "none" }}>

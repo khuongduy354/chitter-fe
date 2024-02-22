@@ -24,15 +24,14 @@ function App() {
         ) : panelMode == "emoji" ? (
           <EmojiPanel />
         ) : (
-          // <ThemePanel />
-          <div>Theme Panel</div>
+          <ThemeEditor />
         )}
       </AppContext.Provider>
     );
   };
   return (
     <div>
-      <ThemeEditor />
+      <MainApp />
     </div>
   );
 }

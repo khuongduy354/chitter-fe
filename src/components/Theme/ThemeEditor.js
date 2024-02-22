@@ -262,11 +262,7 @@ export const ThemeEditor = () => {
           <GeneralSettings {...GeneralSettingsProps} />
           <LayersSettings {...LayersSettingsProps} />
         </div>
-        <ParallaxBackground
-          layers={layers}
-          bgColor={bgColor}
-          dividerProps={dividerProps}
-        />
+        <ParallaxBackground bg={{ layers, divider: dividerProps, bgColor }} />
       </Flex>
     </div>
   );

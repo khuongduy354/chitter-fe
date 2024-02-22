@@ -32,12 +32,9 @@ const ParallaxChunk = ({ layers }) => {
     </ParallaxBanner>
   );
 };
-export const ParallaxBackground = ({
-  style,
-  bgColor,
-  dividerProps,
-  layers,
-}) => {
+export const ParallaxBackground = ({ style, bg }) => {
+  const { layers, divider, bgColor } = bg;
+  console.log(bg);
   return (
     <ParallaxProvider>
       <div
@@ -52,9 +49,9 @@ export const ParallaxBackground = ({
             <ParallaxChunk layers={layers} />
             <div
               style={{
-                height: dividerProps.height,
-                maxHeight: dividerProps.maxHeight,
-                backgroundColor: dividerProps.color,
+                height: divider.height,
+                maxHeight: divider.maxHeight,
+                backgroundColor: divider.color,
               }}
             />
           </div>

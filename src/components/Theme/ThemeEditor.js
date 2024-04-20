@@ -4,251 +4,133 @@ import { ParallaxBackground } from "./ParallaxBackground";
 import { defaultChatTheme } from "../../helper/chatTheme";
 import { RESTQuery } from "../../helper/restQuery";
 import { AppContext } from "../../App";
+import { Select } from "antd";
+import { FileUploadComponent } from "../FileUpload";
 
 const GeneralSettings = ({
   bgColor,
   setBgColor,
-  dividerProps,
-  setDividerProps,
+  bgMode,
+  setBgImage,
+  senderMsgColor,
+  receiverMsgColor,
+  setSenderMsgColor,
+  setReceiverMsgColor,
 }) => {
-  return (
-    <div>
-      <Divider> Background Color </Divider>
-      <Input
-        value={bgColor}
-        type="text"
-        placeholder="Background Color"
-        onChange={(e) => {
-          e.preventDefault();
-          setBgColor(e.target.value);
-        }}
-      />
-      <Divider> Divider Settings</Divider>
-      <List>
-        <label>Max Height</label>
-        <Input
-          type="number"
-          placeholder="Max Height (in pixel)"
-          value={dividerProps.maxHeight}
-          onChange={(e) => {
-            setDividerProps({
-              ...dividerProps,
-              maxHeight: parseInt(e.target.value),
-            });
-          }}
-        />
-        <label>Color</label>
-        <Input
-          type="text"
-          placeholder="Color here"
-          value={dividerProps.color}
-          onChange={(e) => {
-            setDividerProps({ ...dividerProps, color: e.target.value });
-          }}
-        />
-        <label>Height</label>
-        <Input
-          type="number"
-          placeholder="Height (% height of screen )"
-          value={dividerProps.height.split("vh")[0]}
-          onChange={(e) => {
-            setDividerProps({
-              ...dividerProps,
-              height: e.target.value.toString() + "vh",
-            });
-          }}
-        />
-      </List>
-    </div>
-  );
-};
-
-const LayersSettings = ({ layers, setLayers }) => {
-  const uploadFile = (files) => {};
-  return (
-    <div>
-      <Divider>Current Layers</Divider>
-      <Button
-        type="primary"
-        onClick={() => {
-          setLayers([
-            ...layers,
-            {
-              translateYMin: 0,
-              translateYMax: 0,
-              margin: "0 0 0 0",
-              imgUrl: "",
-            },
-          ]);
-        }}
-      >
-        Add Layer
-      </Button>
-      <div>
-        {layers.map((layer, index) => {
-          return (
-            <div key={index}>
-              <Divider>
-                Layer {index}{" "}
-                {!layer.enable ? (
-                  <Button
-                    onClick={() => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        { ...layer, enable: true },
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                    type="primary"
-                  >
-                    Enable
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    onClick={() => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        { ...layer, enable: false },
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                  >
-                    Disable
-                  </Button>
-                )}
-              </Divider>
-
-              {layer.enable && (
-                <List.Item>
-                  <label>Image URL</label>
-                  <Input
-                    type="text"
-                    value={layer.imgUrl}
-                    onChange={(e) => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        { ...layer, imgUrl: e.target.value },
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                  />
-                  <label>Margin</label>
-                  <Input
-                    placeholder="Margin format: top bottom left right"
-                    type="text"
-                    value={layer.margin}
-                    onChange={(e) => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        { ...layer, margin: e.target.value },
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                  />
-                  <label>Translate Y minimum</label>
-                  <Input
-                    type="number"
-                    value={layer.translateYMin}
-                    onChange={(e) => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        {
-                          ...layer,
-                          translateYMin: parseInt(e.target.value),
-                        },
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                  />
-                  <label>Translate Y maximum</label>
-                  <Input
-                    type="number"
-                    value={layer.translateYMax}
-                    onChange={(e) => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        {
-                          ...layer,
-                          translateYMax: parseInt(e.target.value),
-                        },
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                  />
-                  <Button
-                    onClick={() => {
-                      setLayers([
-                        ...layers.slice(0, index),
-                        ...layers.slice(index + 1),
-                      ]);
-                    }}
-                    type="primary"
-                  >
-                    Delete Layer
-                  </Button>
-                </List.Item>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-export const ThemeEditor = () => {
-  const [bgColor, setBgColor] = useState(defaultChatTheme.bg.bgColor);
-  const [dividerProps, setDividerProps] = useState(defaultChatTheme.bg.divider);
-  const [layers, setLayers] = useState(
-    defaultChatTheme.bg.layers.map((l) => ({ ...l, enable: true }))
-  );
-  const [themeName, setThemeName] = useState(defaultChatTheme.themeName);
-  const [senderMsgColor, setSenderMsgColor] = useState(
-    defaultChatTheme.sender_msg_color
-  );
-  const [receiverMsgColor, setReceiverMsgColor] = useState(
-    defaultChatTheme.receiver_msg_color
-  );
-
-  const { user, setPanelMode } = useContext(AppContext);
-  const saveTheme = async () => {
-    // remove enable key from layers
-    const _layers = layers.map((l) => {
-      const { enable, ...rest } = l;
-      return rest;
-    });
-    const theme = {
-      bg: { bgColor, layers: _layers, divider: dividerProps },
-      sender_msg_color: senderMsgColor,
-      receiver_msg_color: receiverMsgColor,
-      themeName,
-    };
-    const newTheme = await RESTQuery.createTheme(user.accessToken, theme);
-    if (newTheme) {
-      alert("Theme saved!");
-    } else {
-      alert("Failed to save theme");
+  const handleFilesUpload = (files) => {
+    if (files[0] && files[0] !== undefined) {
+      // TODO: validate if image
+      setBgImage(URL.createObjectURL(files[0]));
     }
   };
+  return (
+    <div>
+      {bgMode === "color" && (
+        <div>
+          <Input
+            value={bgColor}
+            type="text"
+            placeholder="Background Color"
+            onChange={(e) => {
+              e.preventDefault();
+              setBgColor(e.target.value);
+            }}
+          />
+        </div>
+      )}
+      {bgMode === "image" && (
+        <div>
+          <FileUploadComponent cb={handleFilesUpload} />
+        </div>
+      )}
+      <Divider>Sender Message Color</Divider>
+      <Input
+        value={senderMsgColor.fg}
+        type="text"
+        placeholder="Sender Message Color"
+        onChange={(e) => {
+          e.preventDefault();
+          setSenderMsgColor({ ...senderMsgColor, fg: e.target.value });
+        }}
+      />
+      <Input
+        value={senderMsgColor.bg}
+        type="text"
+        placeholder="Sender Message Background Color"
+        onChange={(e) => {
+          e.preventDefault();
+          setSenderMsgColor({ ...senderMsgColor, bg: e.target.value });
+        }}
+      />
+
+      <Divider>Receiver Message Color</Divider>
+      <Input
+        value={receiverMsgColor.fg}
+        type="text"
+        placeholder="Receiver Message Color"
+        onChange={(e) => {
+          e.preventDefault();
+          setReceiverMsgColor({ ...receiverMsgColor, fg: e.target.value });
+        }}
+      />
+
+      <Input
+        value={receiverMsgColor.bg}
+        type="text"
+        placeholder="Receiver Message Background Color"
+        onChange={(e) => {
+          e.preventDefault();
+          setReceiverMsgColor({ ...receiverMsgColor, bg: e.target.value });
+        }}
+      />
+    </div>
+  );
+};
+
+// mode: image, color
+// payload: image file upload, or  color code
+export const ThemeEditor = () => {
+  const [bgMode, setBgMode] = useState("image");
+  const [bgColor, setBgColor] = useState("#ffffff");
+  const [bgImage, setBgImage] = useState(null);
+
+  const [themeName, setThemeName] = useState(defaultChatTheme.themeName);
+
+  const [senderMsgColor, setSenderMsgColor] = useState({
+    fg: "#000000",
+    bg: "#ffffff",
+  });
+  const [receiverMsgColor, setReceiverMsgColor] = useState({
+    fg: "#ffffff",
+    bg: "#000000",
+  });
+
+  const { user, setPanelMode } = useContext(AppContext);
+  const saveTheme = async () => {};
 
   const GeneralSettingsProps = {
     bgColor,
     setBgColor,
-    dividerProps,
-    setDividerProps,
+    bgMode,
+    senderMsgColor,
+    setSenderMsgColor,
+    receiverMsgColor,
+    setReceiverMsgColor,
+    setBgImage,
   };
-  const LayersSettingsProps = { layers, setLayers };
   return (
     <div>
+      <Button
+        onClick={() => {
+          setPanelMode("chat");
+        }}
+      >
+        Back to user
+      </Button>
+      <br />
+
       <Flex>
         <div>
-          <Button
-            onClick={() => {
-              setPanelMode("chat");
-            }}
-          >
-            Back to user
-          </Button>
           <Divider>Theme Name</Divider>
           <Input
             value={themeName}
@@ -259,10 +141,43 @@ export const ThemeEditor = () => {
           <Button type="primary" onClick={saveTheme}>
             Save Theme
           </Button>
+          <div>
+            <Divider> Background Input </Divider>
+            <span>Background Mode: </span>
+            <Select
+              defaultValue={bgMode}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setBgMode(val);
+              }}
+            >
+              <Select.Option value="color">Color</Select.Option>
+              <Select.Option value="image">Image</Select.Option>
+            </Select>
+          </div>
           <GeneralSettings {...GeneralSettingsProps} />
-          <LayersSettings {...LayersSettingsProps} />
         </div>
-        <ParallaxBackground bg={{ layers, divider: dividerProps, bgColor }} />
+
+        <div className="preview">
+          <div
+            style={{
+              backgroundColor: bgMode === "color" ? bgColor : null,
+              height: "100vh",
+            }}
+          >
+            {bgMode === "image" && bgImage && (
+              <img
+                style={{ position: "absolute", zIndex: -99 }}
+                src={bgImage}
+              />
+            )}
+            <p>Some Message</p>
+          </div>
+        </div>
+
+        {/* <ParallaxBackground bg={{ layers, divider: dividerProps, bgColor }} /> */}
+
+        {/* TODO: preview here */}
       </Flex>
     </div>
   );

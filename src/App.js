@@ -3,7 +3,6 @@ import { Chat } from "./components/Chat/Chat";
 import { Login } from "./components/Login";
 import { EmojiPanel } from "./components/EmojiPanel";
 import { ThemeEditor } from "./components/Theme/ThemeEditor";
-import { ChatPanel } from "./components/Chat/ChatPanel";
 
 export const AppContext = createContext({
   user: null,

@@ -3,6 +3,7 @@ import { Chat } from "./components/Chat/Chat";
 import { Login } from "./components/Login";
 import { EmojiPanel } from "./components/EmojiPanel";
 import { ThemeEditor } from "./components/Theme/ThemeEditor";
+import { MyThemes } from "./components/Theme/MyThemes";
 
 export const AppContext = createContext({
   user: null,
@@ -11,27 +12,24 @@ export const AppContext = createContext({
   setUser: () => {},
 });
 function App() {
+  const [user, setUser] = useState(null);
+  const [panelMode, setPanelMode] = useState("chat"); // chat || emoji | theme
   const MainApp = () => {
-    const [user, setUser] = useState(null);
-    const [panelMode, setPanelMode] = useState("chat"); // chat || emoji | theme
     return (
-      <AppContext.Provider value={{ user, panelMode, setPanelMode, setUser }}>
-        {!user ? (
-          <Login />
-        ) : panelMode == "chat" ? (
-          <Chat />
-        ) : panelMode == "emoji" ? (
-          <EmojiPanel />
-        ) : (
-          <ThemeEditor />
-        )}
-      </AppContext.Provider>
+      <div>
+        {panelMode == "chat" && <Chat />}
+        {panelMode == "emoji" && <EmojiPanel />}
+        {panelMode == "theme" && <ThemeEditor />}
+        {panelMode == "mythemes" && <MyThemes />}
+        {panelMode == "market" && <Market />}
+      </div>
     );
   };
   return (
-    <div>
-      <MainApp />
-    </div>
+    <AppContext.Provider value={{ user, panelMode, setPanelMode, setUser }}>
+      {!user && <Login />}
+      {user && <MainApp />}
+    </AppContext.Provider>
   );
 }
 

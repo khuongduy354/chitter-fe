@@ -13,8 +13,10 @@ export const Chat = () => {
   const [currChatFriend, setCurrChatFriend] = useState(null);
   return (
     <ChatContext.Provider value={{ currChatFriend, setCurrChatFriend }}>
-      <Button onClick={() => setPanelMode("emoji")}>Emoji Panel</Button>
-      <Button onClick={() => setPanelMode("theme")}>Theme Panel</Button>
+      <Button onClick={() => setPanelMode("emoji")}>Emojis</Button>
+      <Button onClick={() => setPanelMode("theme")}>Theme Edit</Button>
+      <Button onClick={() => setPanelMode("market")}>Market</Button>
+      <Button onClick={() => setPanelMode("mythemes")}>My Themes</Button>
       <Flex justify="space-around">
         <UserPanel />
         {currChatFriend && <ChatPanel />}

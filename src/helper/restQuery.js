@@ -224,6 +224,63 @@ const getMessages = async (accessToken, roomId) => {
   }
   return null;
 };
+
+const ThemeAPI = {
+  getMarketItems: async () => {
+    const res = await fetch(process.env.REACT_APP_REST_URL + "/theme");
+    if (res.ok) {
+      return (await res.json()).themes;
+    }
+    return null;
+  },
+  buyTheme: async (accessToken, id) => {
+    const res = await fetch(
+      process.env.REACT_APP_REST_URL + "/themes/" + id + "/download",
+      {
+        method: "POST",
+        headers: {
+          Authorization: accessToken,
+        },
+      }
+    );
+    return res;
+  },
+  publishTheme: async (accessToken, id) => {
+    const res = await fetch(
+      process.env.REACT_APP_REST_URL + "/themes/" + id + "/publish",
+      {
+        method: "POST",
+        headers: {
+          Authorization: accessToken,
+        },
+      }
+    );
+    return res;
+  },
+  unpublishTheme: async (accessToken, id) => {
+    const res = await fetch(
+      process.env.REACT_APP_REST_URL + "/themes/" + id + "/unpublish",
+      {
+        method: "POST",
+        headers: {
+          Authorization: accessToken,
+        },
+      }
+    );
+    return res;
+  },
+  getMyThemes: async (accessToken) => {
+    const res = await fetch(process.env.REACT_APP_REST_URL + "/me/themes", {
+      headers: {
+        Authorization: accessToken,
+      },
+    });
+    if (res.ok) {
+      return (await res.json()).themes;
+    }
+    return null;
+  },
+};
 export const RESTQuery = {
   getRoom,
   getUser,
@@ -245,4 +302,5 @@ export const RESTQuery = {
   createTheme,
 
   getMessages,
+  ThemeAPI,
 };

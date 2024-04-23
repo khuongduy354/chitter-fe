@@ -195,19 +195,6 @@ const uploadEmoji = async (accessToken, formdata) => {
   return res.ok;
 };
 
-const createTheme = async (accessToken, theme) => {
-  const url = process.env.REACT_APP_REST_URL + "/theme";
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { Authorization: accessToken, "Content-type": "application/json" },
-    body: JSON.stringify({ theme }),
-  });
-  if (res.ok) {
-    const data = await res.json();
-    return data.theme;
-  }
-  return null;
-};
 const getMessages = async (accessToken, roomId) => {
   const url = process.env.REACT_APP_REST_URL + "/room/msg";
   const res = await fetch(url, {
@@ -226,6 +213,21 @@ const getMessages = async (accessToken, roomId) => {
 };
 
 const ThemeAPI = {
+  createTheme: async (accessToken, theme) => {
+    const url = process.env.REACT_APP_REST_URL + "/theme";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: accessToken,
+      },
+      body: theme,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.theme;
+    }
+    return null;
+  },
   getMarketItems: async () => {
     const res = await fetch(process.env.REACT_APP_REST_URL + "/theme");
     if (res.ok) {
@@ -298,8 +300,6 @@ export const RESTQuery = {
   uploadEmoji,
   getMyEmojis,
   deleteEmoji,
-
-  createTheme,
 
   getMessages,
   ThemeAPI,

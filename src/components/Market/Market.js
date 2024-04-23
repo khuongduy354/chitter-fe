@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
 import AppContext from "antd/es/app/context";
 import { Button } from "antd";
+import { BackHome } from "../BackHome";
 
 export const Market = () => {
   const [themes, setThemes] = useState([]);
@@ -26,6 +27,7 @@ export const Market = () => {
 
   return (
     <div>
+      <BackHome />
       {themes.map((theme, idx) => {
         return (
           <div key={idx}>

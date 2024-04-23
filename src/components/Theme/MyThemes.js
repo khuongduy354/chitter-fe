@@ -1,11 +1,13 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
 import { AppContext } from "../../App";
+import { Button } from "antd";
+import { BackHome } from "../BackHome";
 
 export const MyThemes = () => {
   const [themes, setThemes] = useState([]);
   const fetchMyThemes = async () => {
-    const themes = await RESTQuery.ThemeAPI.getMyThemes();
+    const themes = await RESTQuery.ThemeAPI.getMyThemes(user.accessToken);
     if (themes) setThemes(themes);
   };
   useEffect(() => {
@@ -30,12 +32,13 @@ export const MyThemes = () => {
   };
   return (
     <div>
+      <BackHome />
       {themes.map((theme, idx) => {
         const isOwned = theme.author.id === user.id;
         const isPublished = isOwned && theme.published;
 
         return (
-          <div>
+          <div key={idx}>
             <h2>{theme.title}</h2>
             {isOwned && (
               <Button
@@ -46,6 +49,7 @@ export const MyThemes = () => {
                 {isPublished ? "Unpublish" : "Publish"}
               </Button>
             )}
+            <Button> Apply </Button>
           </div>
         );
       })}

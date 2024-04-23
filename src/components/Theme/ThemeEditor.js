@@ -20,7 +20,7 @@ const GeneralSettings = ({
   const handleFilesUpload = (files) => {
     if (files[0] && files[0] !== undefined) {
       // TODO: validate if image
-      setBgImage(URL.createObjectURL(files[0]));
+      setBgImage(files[0]);
     }
   };
   return (
@@ -90,8 +90,8 @@ const GeneralSettings = ({
 // mode: image, color
 // payload: image file upload, or  color code
 export const ThemeEditor = () => {
-  const [bgMode, setBgMode] = useState("image");
-  const [bgColor, setBgColor] = useState("#ffffff");
+  const [bgMode, setBgMode] = useState("color");
+  const [bgColor, setBgColor] = useState("#000fff");
   const [bgImage, setBgImage] = useState(null);
 
   const [themeName, setThemeName] = useState(defaultChatTheme.themeName);
@@ -106,7 +106,42 @@ export const ThemeEditor = () => {
   });
 
   const { user, setPanelMode } = useContext(AppContext);
-  const saveTheme = async () => {};
+  const saveTheme = async () => {
+    const theme = {
+      title: themeName,
+      background: {
+        bgType: bgMode,
+      },
+      messages: {
+        selfMessage: {
+          textColor: senderMsgColor.fg,
+          backgroundColor: senderMsgColor.bg,
+        },
+        otherMessage: {
+          textColor: receiverMsgColor.fg,
+          backgroundColor: receiverMsgColor.bg,
+        },
+      },
+      author: user.id,
+    };
+
+    const formdata = new FormData();
+    if (bgMode === "image" && bgImage && bgImage !== undefined)
+      formdata.append("image", bgImage);
+    else if (bgMode === "color") theme.background.color = bgColor;
+
+    formdata.append("themePayload", JSON.stringify(theme));
+
+    const themes = await RESTQuery.ThemeAPI.createTheme(
+      user.accessToken,
+      formdata
+    );
+    if (themes) {
+      alert("Theme saved");
+    } else {
+      alert("Failed to save theme");
+    }
+  };
 
   const GeneralSettingsProps = {
     bgColor,
@@ -157,21 +192,48 @@ export const ThemeEditor = () => {
           </div>
           <GeneralSettings {...GeneralSettingsProps} />
         </div>
-
+        {/* PREVIEW SECTION */}
         <div className="preview">
           <div
             style={{
               backgroundColor: bgMode === "color" ? bgColor : null,
               height: "100vh",
+              width: "50vw",
             }}
           >
             {bgMode === "image" && bgImage && (
               <img
                 style={{ position: "absolute", zIndex: -99 }}
-                src={bgImage}
+                src={URL.createObjectURL(bgImage)}
               />
             )}
-            <p>Some Message</p>
+
+            <div
+              style={{
+                background: senderMsgColor.bg,
+                color: senderMsgColor.fg,
+                padding: 10,
+                borderRadius: 10,
+                maxWidth: 200,
+                textAlign: "center",
+              }}
+            >
+              Sender message
+            </div>
+            <div
+              className=""
+              style={{
+                background: receiverMsgColor.bg,
+                color: receiverMsgColor.fg,
+                padding: 10,
+                maxWidth: 200,
+                textAlign: "center",
+                borderRadius: 10,
+                float: "right",
+              }}
+            >
+              Receiver message
+            </div>
           </div>
         </div>
 

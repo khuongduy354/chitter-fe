@@ -4,6 +4,7 @@ import { Login } from "./components/Login";
 import { EmojiPanel } from "./components/EmojiPanel";
 import { ThemeEditor } from "./components/Theme/ThemeEditor";
 import { MyThemes } from "./components/Theme/MyThemes";
+import { Market } from "./components/Market/Market";
 
 export const AppContext = createContext({
   user: null,

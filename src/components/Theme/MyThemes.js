@@ -34,7 +34,7 @@ export const MyThemes = () => {
     <div>
       <BackHome />
       {themes.map((theme, idx) => {
-        const isOwned = theme.author.id === user.id;
+        const isOwned = theme.author === user.id;
         const isPublished = isOwned && theme.published;
 
         return (

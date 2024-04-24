@@ -229,7 +229,7 @@ const ThemeAPI = {
     return null;
   },
   getMarketItems: async () => {
-    const res = await fetch(process.env.REACT_APP_REST_URL + "/theme");
+    const res = await fetch(process.env.REACT_APP_REST_URL + "/market");
     if (res.ok) {
       return (await res.json()).themes;
     }

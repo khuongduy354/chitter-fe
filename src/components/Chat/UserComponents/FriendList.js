@@ -11,6 +11,7 @@ export const FriendList = () => {
 
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
+  const [themePicker, setShowThemePicker] = useState(false);
 
   useEffect(() => {
     getFriends();
@@ -71,7 +72,13 @@ export const FriendList = () => {
               <li key={idx}>
                 {friend.email}
                 <span> </span>
-                <Button onClick={() => setCurrChatFriend(friend)}>Chat</Button>
+                <Button
+                  onClick={() => {
+                    setCurrChatFriend(friend);
+                  }}
+                >
+                  Chat
+                </Button>
               </li>
             );
           })}

@@ -1,11 +1,12 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
 import { getSocket } from "../../helper/socket";
-import { Button, Flex } from "antd";
+import { Button, Flex, theme } from "antd";
 import { AppContext } from "../../App";
 import { ChatContext } from "./Chat";
+import { MyThemes } from "../Theme/MyThemes";
 
-const ChatTheme = ({ theme }) => {
+export const ChatTheme = ({ theme = null, messages = [] }) => {
   // const sample = {
   //   _id: { $oid: "661e53d01b0c5c829139cc2b" },
   //   title: "My Theme",
@@ -14,6 +15,15 @@ const ChatTheme = ({ theme }) => {
   //     color: "#ffffff",
   //     _id: { $oid: "661e53d01b0c5c829139cc2c" },
   //   },
+  //   messages: {
+  //     selfMessage: {
+  //       backgroundColor: "#000000",
+  //       textColor: "#ffffff"
+  //     },
+  //     otherMessage: {
+  //       backgroundColor: "#ffffff",
+  //       textColor: "#000000"
+  //     },
   //   emojis: [
   //     { $oid: "611d29bafba6b60015eae6c7" },
   //     { $oid: "611d29bafba6b60015eae6c8" },
@@ -21,6 +31,7 @@ const ChatTheme = ({ theme }) => {
   //   author: "550e8400-e29b-41d4-a716-446655440000",
   //   __v: { $numberInt: "0" },
   // };
+  console.log(theme);
   const Background = () => {
     return (
       <div>
@@ -39,9 +50,42 @@ const ChatTheme = ({ theme }) => {
       </div>
     );
   };
+  const { user } = useContext(AppContext);
   return (
-    <div>
-      <Background />
+    <div style={{ overflow: "scroll" }}>
+      {theme && <Background />}
+      <ul style={{ listStyle: "none" }}>
+        {messages.map((msg, idx) => {
+          const isMyMsg = msg.from === user.id;
+          const applyTheme = (isMyMsg) => {
+            if (theme.messages === undefined)
+              return { textColor: "white", backgroundColor: "black" };
+            if (isMyMsg) {
+              return theme.messages.selfMessage;
+            }
+            return theme.messages.otherMessage;
+          };
+          return (
+            <li key={idx}>
+              <Flex justify={isMyMsg ? "flex-end" : "flex-start"}>
+                <span
+                  style={{
+                    backgroundColor: theme
+                      ? applyTheme(isMyMsg).backgroundColor
+                      : "blue",
+                    padding: 10,
+                    borderRadius: 20,
+                    color: theme ? applyTheme(isMyMsg).textColor : "white",
+                    margin: 5,
+                  }}
+                >
+                  {msg.content}
+                </span>
+              </Flex>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 };
@@ -49,12 +93,13 @@ const ChatTheme = ({ theme }) => {
 export const ChatPanel = () => {
   const { currChatFriend } = useContext(ChatContext);
   const { user } = useContext(AppContext);
+  const { setActiveRoom, activeRoom } = useContext(ChatContext);
 
   const sendMsgRef = useRef(null);
   const [chatContent, setChatContent] = useState([]);
-  const [room, setRoom] = useState(null); // use this for theme
   const [chatTheme, setChatTheme] = useState(null);
   const [emojisBox, setEmojisBox] = useState([]);
+  const [themePicker, setThemePicker] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -71,7 +116,7 @@ export const ChatPanel = () => {
       if (!user || !currChatFriend) return;
       const _r = await RESTQuery.getRoom(user.accessToken, currChatFriend.id);
       if (_r) {
-        setRoom(_r);
+        setActiveRoom(_r);
         if (_r.theme) {
           setChatTheme(_r.theme);
           setEmojisBox(_r.theme.emojis);
@@ -83,13 +128,14 @@ export const ChatPanel = () => {
 
   useEffect(() => {
     async function getMsgs() {
-      const msgs = await RESTQuery.getMessages(user.accessToken, room.id);
+      const msgs = await RESTQuery.getMessages(user.accessToken, activeRoom.id);
+      console.log(msgs);
       if (msgs) {
         setChatContent(msgs);
       }
     }
-    if (room) getMsgs();
-  }, [room]);
+    if (activeRoom) getMsgs();
+  }, [activeRoom]);
 
   const sendMsg = () => {
     const socket = getSocket();
@@ -102,8 +148,24 @@ export const ChatPanel = () => {
       );
     sendMsgRef.current.value = "";
   };
+
   return (
     <div>
+      <Button
+        onClick={() => {
+          setThemePicker(true);
+        }}
+      >
+        Pick theme
+      </Button>
+      {themePicker && (
+        <MyThemes
+          closeCb={() => {
+            setThemePicker(false);
+          }}
+        />
+      )}
+
       <Flex
         className="RightBar"
         vertical
@@ -113,46 +175,7 @@ export const ChatPanel = () => {
       >
         <h3>Chatting with {currChatFriend && currChatFriend.email}</h3>
 
-        <div style={{ overflow: "scroll" }}>
-          {chatTheme && (
-            <ChatTheme theme={chatTheme} />
-            // <ParallaxBackground
-            //   style={{
-            //     position: "absolute",
-            //     zIndex: -1,
-            //     maxWidth: "50%",
-            //     top: 0,
-            //     maxHeight: "100vh",
-            //     overflow: "scroll",
-            //   }}
-            //   bg={chatTheme.bg}
-            // />
-          )}
-          <ul style={{ listStyle: "none" }}>
-            {chatContent.map((msg, idx) => {
-              return (
-                <li key={idx}>
-                  <Flex
-                    justify={msg.from === user.id ? "flex-end" : "flex-start"}
-                  >
-                    <span
-                      style={{
-                        backgroundColor:
-                          msg.from === user.id ? "blue" : "black",
-                        padding: 10,
-                        borderRadius: 20,
-                        color: "white",
-                        margin: 5,
-                      }}
-                    >
-                      {msg.content}
-                    </span>
-                  </Flex>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <ChatTheme theme={activeRoom.theme} messages={chatContent} />
 
         <div className="msgSender">
           <input ref={sendMsgRef} type="text" />

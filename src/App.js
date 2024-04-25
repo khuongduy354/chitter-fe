@@ -21,7 +21,7 @@ function App() {
         {panelMode == "chat" && <Chat />}
         {panelMode == "emoji" && <EmojiPanel />}
         {panelMode == "theme" && <ThemeEditor />}
-        {panelMode == "mythemes" && <MyThemes />}
+        {/* {panelMode == "mythemes" && <MyThemes />} */}
         {panelMode == "market" && <Market />}
       </div>
     );

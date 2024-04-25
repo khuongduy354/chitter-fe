@@ -282,6 +282,21 @@ const ThemeAPI = {
     }
     return null;
   },
+
+  applyTheme: async (accessToken, themeId, chatRoomId) => {
+    const res = await fetch(
+      process.env.REACT_APP_REST_URL + "/themes/" + themeId + "/apply",
+      {
+        method: "POST",
+        headers: {
+          Authorization: accessToken,
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ chatRoomId }),
+      }
+    );
+    return res;
+  },
 };
 export const RESTQuery = {
   getRoom,

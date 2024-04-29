@@ -4,8 +4,9 @@ import { AppContext } from "../../App";
 import { Button } from "antd";
 import { BackHome } from "../BackHome";
 import { ChatContext } from "../Chat/Chat";
+import { ChatTheme } from "../Chat/ChatPanel";
 
-export const MyThemes = ({ closeCb = () => {} }) => {
+export const MyThemes = ({ closeCb = () => {}, showPublish = false }) => {
   const [themes, setThemes] = useState([]);
   const fetchMyThemes = async () => {
     const themes = await RESTQuery.ThemeAPI.getMyThemes(user.accessToken);
@@ -59,7 +60,7 @@ export const MyThemes = ({ closeCb = () => {} }) => {
         return (
           <div key={idx}>
             <h2>{theme.title}</h2>
-            {isOwned && (
+            {isOwned && showPublish && (
               <Button
                 onClick={() => {
                   isPublished ? unPublish(theme._id) : publishTheme(theme._id);
@@ -68,6 +69,20 @@ export const MyThemes = ({ closeCb = () => {} }) => {
                 {isPublished ? "Unpublish" : "Publish"}
               </Button>
             )}
+            <ChatTheme
+              bgAbs={true}
+              theme={theme}
+              messages={[
+                {
+                  content: "Hello",
+                  from: "me",
+                },
+                {
+                  content: "Hi there",
+                  from: "me",
+                },
+              ]}
+            />
             <Button onClick={() => applyTheme(theme)}> Apply </Button>
           </div>
         );

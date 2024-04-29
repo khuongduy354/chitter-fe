@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
 import { AppContext } from "../../App";
 import { Button } from "antd";
-import { BackHome } from "../BackHome";
 import { ChatContext } from "../Chat/Chat";
 import { ChatTheme } from "../Chat/ChatPanel";
 
@@ -44,7 +43,7 @@ export const MyThemes = ({ closeCb = () => {}, showPublish = false }) => {
     if (res.ok) {
       const room = (await res.json()).room;
       console.log(room);
-      setActiveRoom({ ...activeRoom, theme: room.theme });
+      setActiveRoom({ ...activeRoom, theme: room });
       alert("Theme applied");
     } else {
       alert("Failed to apply theme");

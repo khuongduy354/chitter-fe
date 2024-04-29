@@ -20,7 +20,7 @@ export const Chat = () => {
       <Button onClick={() => setPanelMode("emoji")}>Emojis</Button>
       <Button onClick={() => setPanelMode("theme")}>Theme Edit</Button>
       <Button onClick={() => setPanelMode("market")}>Market</Button>
-      {/* <Button onClick={() => setPanelMode("mythemes")}>My Themes</Button> */}
+      <Button onClick={() => setPanelMode("mythemes")}>My Themes</Button>
       <Flex justify="space-around">
         <UserPanel />
         {currChatFriend && <ChatPanel />}

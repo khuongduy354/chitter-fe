@@ -62,16 +62,17 @@ export const ChatTheme = ({ theme = null, messages = [], bgAbs = true }) => {
   };
   const { user } = useContext(AppContext);
   return (
-    <div style={{ overflow: "scroll" }}>
-      {theme && bgAbs ? (
-        <Background />
-      ) : (
-        <img
-          src={theme.background.image}
-          alt="background"
-          style={{ width: "100%", height: "100%" }}
-        ></img>
-      )}
+    <div style={{ overflowY: "scroll", overflowX: "hidden" }}>
+      {theme &&
+        (bgAbs ? (
+          <Background />
+        ) : (
+          <img
+            src={theme.background.image}
+            alt="background"
+            style={{ width: "100%", height: "100%" }}
+          ></img>
+        ))}
       <ul style={{ listStyle: "none" }}>
         {messages.map((msg, idx) => {
           const isMyMsg = msg.from === user.id;
@@ -147,12 +148,15 @@ export const ChatPanel = () => {
   useEffect(() => {
     async function getMsgs() {
       const msgs = await RESTQuery.getMessages(user.accessToken, activeRoom.id);
-      console.log(msgs);
       if (msgs) {
         setChatContent(msgs);
       }
     }
-    if (activeRoom) getMsgs();
+    if (activeRoom) {
+      getMsgs();
+      console.log(activeRoom);
+      setChatTheme(activeRoom.theme);
+    }
   }, [activeRoom]);
 
   const sendMsg = () => {
@@ -193,7 +197,7 @@ export const ChatPanel = () => {
           justify="space-between"
           style={{ height: "90vh" }}
         >
-          <ChatTheme theme={activeRoom.theme} messages={chatContent} />
+          <ChatTheme theme={chatTheme} messages={chatContent} />
 
           <div className="msgSender">
             <input ref={sendMsgRef} type="text" />

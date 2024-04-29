@@ -21,7 +21,9 @@ function App() {
         {panelMode == "chat" && <Chat />}
         {panelMode == "emoji" && <EmojiPanel />}
         {panelMode == "theme" && <ThemeEditor />}
-        {/* {panelMode == "mythemes" && <MyThemes />} */}
+        {panelMode == "mythemes" && (
+          <MyThemes closeCb={() => setPanelMode("chat")} showPublish={true} />
+        )}
         {panelMode == "market" && <Market />}
       </div>
     );

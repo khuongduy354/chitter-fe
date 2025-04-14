@@ -197,13 +197,21 @@ export const ThemeEditor = () => {
           <div
             style={{
               backgroundColor: bgMode === "color" ? bgColor : null,
+              paddingTop: 50,
               height: "100vh",
               width: "50vw",
             }}
           >
             {bgMode === "image" && bgImage && (
               <img
-                style={{ position: "absolute", zIndex: -99 }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  maxHeight: "500px",
+                  maxWidth: "680px",
+                  position: "absolute",
+                  zIndex: -99,
+                }}
                 src={URL.createObjectURL(bgImage)}
               />
             )}
@@ -215,7 +223,35 @@ export const ThemeEditor = () => {
                 padding: 10,
                 borderRadius: 10,
                 maxWidth: 200,
+                marginTop: 10,
+                marginLeft: 20,
+              }}
+            >
+              Sender message
+            </div>
+            <div
+              style={{
+                background: senderMsgColor.bg,
+                color: senderMsgColor.fg,
+                padding: 10,
+                borderRadius: 10,
+                maxWidth: 200,
+                marginTop: 10,
+                marginLeft: 20,
+              }}
+            >
+              Hi, other text will appear here
+            </div>
+            <div
+              style={{
+                background: senderMsgColor.bg,
+                color: senderMsgColor.fg,
+                padding: 10,
+                borderRadius: 10,
+                maxWidth: 200,
                 textAlign: "center",
+                marginTop: 10,
+                marginLeft: 20,
               }}
             >
               Sender message
@@ -223,16 +259,18 @@ export const ThemeEditor = () => {
             <div
               className=""
               style={{
+                marginTop: 10,
+                display: "block",
+                marginRight: 20,
                 background: receiverMsgColor.bg,
                 color: receiverMsgColor.fg,
                 padding: 10,
                 maxWidth: 200,
-                textAlign: "center",
                 borderRadius: 10,
                 float: "right",
               }}
             >
-              Receiver message
+              Receiver message: you doing great?
             </div>
           </div>
         </div>

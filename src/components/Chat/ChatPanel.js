@@ -61,9 +61,11 @@ export const ChatTheme = ({ theme = null, messages = [], bgAbs = true }) => {
     );
   };
   const { user } = useContext(AppContext);
+  console.log(theme);
   return (
     <div style={{ overflowY: "scroll", overflowX: "hidden" }}>
       {theme &&
+        theme !== undefined &&
         (bgAbs ? (
           <Background />
         ) : (

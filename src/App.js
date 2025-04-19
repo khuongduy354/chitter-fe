@@ -30,8 +30,7 @@ function App() {
   };
   return (
     <AppContext.Provider value={{ user, panelMode, setPanelMode, setUser }}>
-      {!user && <Login />}
-      {user && <MainApp />}
+      <MainApp />
     </AppContext.Provider>
   );
 }

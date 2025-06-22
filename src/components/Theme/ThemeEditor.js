@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { ParallaxBackground } from "./ParallaxBackground";
 import { defaultChatTheme } from "../../helper/chatTheme";
 import { RESTQuery } from "../../helper/restQuery";
-import { AppContext } from "../../App";
+import { AppContext } from "../../contexts/AppContext";
 import { Select } from "antd";
 import { FileUploadComponent } from "../FileUpload";
 

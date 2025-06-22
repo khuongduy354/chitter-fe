@@ -3,7 +3,7 @@ import { ChatContext } from "../Chat";
 import { RESTQuery } from "../../../helper/restQuery";
 import { info } from "../../../helper/info";
 import { Button, Divider } from "antd";
-import { AppContext } from "../../../App";
+import { AppContext } from "../../../contexts/AppContext";
 
 export const SearchBar = () => {
   const { setCurrChatFriend } = useContext(ChatContext); // allow chatting stranger

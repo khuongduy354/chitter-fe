@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
 import { Button } from "antd";
 import { BackHome } from "../BackHome";
-import { AppContext } from "../../App";
+import { AppContext } from "../../contexts/AppContext";
 import { ChatTheme } from "../Chat/ChatPanel";
 
 export const Market = () => {

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
-import { AppContext } from "../../App";
+import { AppContext } from "../../contexts/AppContext";
 import { Button } from "antd";
 import { ChatContext } from "../Chat/Chat";
 import { ChatTheme } from "../Chat/ChatPanel";

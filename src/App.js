@@ -1,36 +1,66 @@
-import { createContext, useContext, useState } from "react";
+import { useState } from "react";
 import { Chat } from "./components/Chat/Chat";
 import { Login } from "./components/Login";
 import { EmojiPanel } from "./components/EmojiPanel";
 import { ThemeEditor } from "./components/Theme/ThemeEditor";
 import { MyThemes } from "./components/Theme/MyThemes";
 import { Market } from "./components/Market/Market";
+import { AppContext } from "./contexts/AppContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { SocketProvider } from "./contexts/SocketContext";
+import { Button, Flex } from "antd";
+import { supabase } from "./components/Login";
 
-export const AppContext = createContext({
-  user: null,
-  panelMode: "chat",
-  setPanelMode: () => {},
-  setUser: () => {},
-});
 function App() {
   const [user, setUser] = useState(null);
   const [panelMode, setPanelMode] = useState("chat"); // chat || emoji | theme
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+    } catch (error) {
+      console.error("Error signing out:", error.message);
+    }
+  };
+
   const MainApp = () => {
+    if (!user) {
+      return <Login />;
+    }
+
     return (
-      <div>
-        {panelMode == "chat" && <Chat />}
-        {panelMode == "emoji" && <EmojiPanel />}
-        {panelMode == "theme" && <ThemeEditor />}
-        {panelMode == "mythemes" && (
-          <MyThemes closeCb={() => setPanelMode("chat")} showPublish={true} />
-        )}
-        {panelMode == "market" && <Market />}
-      </div>
+      <Flex vertical align="center" style={{ padding: "2rem" }}>
+        <Flex gap="small" style={{ marginBottom: "1rem" }}>
+          <Button onClick={() => setPanelMode("emoji")}>Emojis</Button>
+          <Button onClick={() => setPanelMode("theme")}>Theme Edit</Button>
+          <Button onClick={() => setPanelMode("market")}>Market</Button>
+          <Button onClick={() => setPanelMode("mythemes")}>My Themes</Button>
+          <Button onClick={handleSignOut} danger>
+            Sign Out
+          </Button>
+        </Flex>
+        <div style={{ width: "100%", maxWidth: "1200px" }}>
+          {panelMode === "chat" && <Chat />}
+          {panelMode === "emoji" && <EmojiPanel />}
+          {panelMode === "theme" && <ThemeEditor />}
+          {panelMode === "mythemes" && (
+            <MyThemes closeCb={() => setPanelMode("chat")} showPublish={true} />
+          )}
+          {panelMode === "market" && <Market />}
+        </div>
+      </Flex>
     );
   };
+
   return (
     <AppContext.Provider value={{ user, panelMode, setPanelMode, setUser }}>
-      <MainApp />
+      <SocketProvider>
+        <ThemeProvider>
+          <MainApp />
+        </ThemeProvider>
+      </SocketProvider>
     </AppContext.Provider>
   );
 }

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { RESTQuery } from "../../../helper/restQuery";
 import { Button, Divider } from "antd";
-import { AppContext } from "../../../App";
+import { AppContext } from "../../../contexts/AppContext";
 import { info } from "../../../helper/info";
 
 export const GroupPanel = () => {

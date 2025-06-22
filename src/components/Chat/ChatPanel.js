@@ -1,8 +1,8 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { RESTQuery } from "../../helper/restQuery";
+import { useContext, useRef, useState, useEffect } from "react";
 import { getSocket } from "../../helper/socket";
-import { Button, Flex, theme } from "antd";
-import { AppContext } from "../../App";
+import { RESTQuery } from "../../helper/restQuery";
+import { Button, Flex } from "antd";
+import { AppContext } from "../../contexts/AppContext";
 import { ChatContext } from "./Chat";
 import { MyThemes } from "../Theme/MyThemes";
 
@@ -61,7 +61,6 @@ export const ChatTheme = ({ theme = null, messages = [], bgAbs = true }) => {
     );
   };
   const { user } = useContext(AppContext);
-  console.log(theme);
   return (
     <div style={{ overflowY: "scroll", overflowX: "hidden" }}>
       {theme &&
@@ -115,22 +114,25 @@ export const ChatPanel = () => {
   const { currChatFriend } = useContext(ChatContext);
   const { user } = useContext(AppContext);
   const { setActiveRoom, activeRoom } = useContext(ChatContext);
+  const messageListRef = useRef(null);
 
   const sendMsgRef = useRef(null);
   const [chatContent, setChatContent] = useState([]);
   const [chatTheme, setChatTheme] = useState(null);
-  const [emojisBox, setEmojisBox] = useState([]);
   const [themePicker, setThemePicker] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    // load chat msgs
     const socket = getSocket();
     socket.emit("initConnection", user.id);
     socket.on("userChatReceive", ({ content, from }) => {
-      setChatContent([...chatContent, { content, from }]);
+      setChatContent((prev) => [
+        ...prev,
+        { content, from, timestamp: new Date() },
+      ]);
+      scrollToBottom();
     });
-  }, [chatContent]);
+  }, [user]);
 
   useEffect(() => {
     async function getRoom() {
@@ -140,75 +142,194 @@ export const ChatPanel = () => {
         setActiveRoom(_r);
         if (_r.theme) {
           setChatTheme(_r.theme);
-          setEmojisBox(_r.theme.emojis);
         }
       }
     }
     if (currChatFriend) getRoom();
-  }, [currChatFriend]);
+  }, [currChatFriend, user, setActiveRoom]);
 
   useEffect(() => {
     async function getMsgs() {
+      if (!activeRoom || !user?.accessToken) return;
       const msgs = await RESTQuery.getMessages(user.accessToken, activeRoom.id);
       if (msgs) {
-        setChatContent(msgs);
+        setChatContent(
+          msgs.map((msg) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp || Date.now()),
+          }))
+        );
+        scrollToBottom();
       }
-    }
-    if (activeRoom) {
-      getMsgs();
-      console.log(activeRoom);
       setChatTheme(activeRoom.theme);
     }
-  }, [activeRoom]);
+    getMsgs();
+  }, [activeRoom, user?.accessToken]);
+
+  const scrollToBottom = () => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMsg();
+    }
+  };
 
   const sendMsg = () => {
+    const message = sendMsgRef.current.value.trim();
+    if (!message) return;
+
     const socket = getSocket();
-    if (chatContent != null)
-      socket.emit(
-        "userChat",
-        user.id,
-        currChatFriend.id,
-        sendMsgRef.current.value
-      );
+    socket.emit("userChat", user.id, currChatFriend.id, message);
+    setChatContent((prev) => [
+      ...prev,
+      { content: message, from: user.id, timestamp: new Date() },
+    ]);
     sendMsgRef.current.value = "";
+    scrollToBottom();
   };
 
   return (
-    <div>
-      <h3>Chatting with {currChatFriend && currChatFriend.email}</h3>
-      <Button
-        onClick={() => {
-          setThemePicker(true);
+    <div
+      style={{
+        width: "80%",
+        margin: "0 auto",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        display: "flex",
+        height: "calc(100vh - 40px)",
+        backgroundColor: "#fff",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      {/* Left Panel - Users Tab */}
+      <div
+        style={{
+          width: "300px",
+          borderRight: "1px solid #e2e8f0",
+          padding: "20px",
+          overflowY: "auto",
         }}
       >
-        Pick theme
-      </Button>
-      {themePicker && (
-        <MyThemes
-          closeCb={() => {
-            setThemePicker(false);
+        <h2 style={{ marginBottom: "20px" }}>Chats</h2>
+        {/* Add your users list component here */}
+      </div>
+
+      {/* Right Panel - Chat Area */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <div
+          className="chatHeader"
+          style={{
+            padding: "20px",
+            borderBottom: "1px solid #e2e8f0",
           }}
-        />
-      )}
-
-      {activeRoom && !themePicker && (
-        <Flex
-          className="RightBar"
-          vertical
-          align="space-between"
-          justify="space-between"
-          style={{ height: "90vh" }}
         >
-          <ChatTheme theme={chatTheme} messages={chatContent} />
-
-          <div className="msgSender">
-            <input ref={sendMsgRef} type="text" />
-            <Button type="primary" onClick={sendMsg}>
-              Send
+          <div className="userInfo">
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                backgroundColor: "#e2e8f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.2rem",
+                color: "#64748b",
+              }}
+            >
+              {currChatFriend?.email?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h3 style={{ margin: 0 }}>{currChatFriend?.email}</h3>
+              <div className="userStatus">
+                <span className="statusDot"></span>
+                <span>Online</span>
+              </div>
+            </div>
+          </div>
+          <div className="actionButtons">
+            <Button
+              className="actionButton"
+              onClick={() => setThemePicker(true)}
+              icon={
+                <span role="img" aria-label="theme">
+                  🎨
+                </span>
+              }
+            >
+              Theme
             </Button>
           </div>
-        </Flex>
-      )}
+        </div>
+
+        {themePicker && (
+          <MyThemes
+            closeCb={() => {
+              setThemePicker(false);
+            }}
+          />
+        )}
+
+        {activeRoom && !themePicker && (
+          <Flex vertical style={{ height: "100%", overflow: "hidden" }}>
+            <div
+              className="messageList"
+              ref={messageListRef}
+              style={{
+                flex: 1,
+                overflowY: "auto",
+                padding: "20px",
+              }}
+            >
+              <ChatTheme theme={chatTheme} messages={chatContent} />
+            </div>
+
+            <div
+              className="inputContainer"
+              style={{
+                padding: "20px",
+                borderTop: "1px solid #e2e8f0",
+                display: "flex",
+                gap: "10px",
+              }}
+            >
+              <textarea
+                ref={sendMsgRef}
+                className="input"
+                placeholder="Type a message..."
+                onKeyPress={handleKeyPress}
+                rows={1}
+                style={{
+                  resize: "none",
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: "4px",
+                  border: "1px solid #e2e8f0",
+                }}
+              />
+              <Button
+                className="sendButton"
+                onClick={sendMsg}
+                icon={
+                  <span role="img" aria-label="send">
+                    📤
+                  </span>
+                }
+                style={{
+                  height: "100%",
+                }}
+              >
+                Send
+              </Button>
+            </div>
+          </Flex>
+        )}
+      </div>
     </div>
   );
 };

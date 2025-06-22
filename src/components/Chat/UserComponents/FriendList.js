@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { RESTQuery } from "../../../helper/restQuery";
 import { info } from "../../../helper/info";
-import { AppContext } from "../../../App";
+import { AppContext } from "../../../contexts/AppContext";
 import { Button, Divider } from "antd";
 import { ChatContext } from "../Chat";
 

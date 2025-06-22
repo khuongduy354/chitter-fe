@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { RESTQuery } from "../../helper/restQuery";
 import { getSocket } from "../../helper/socket";
 import { Button, Flex, theme } from "antd";
-import { AppContext } from "../../App";
+import { AppContext } from "../../contexts/AppContext";
 import { ChatContext } from "./Chat";
 import { MyThemes } from "../Theme/MyThemes";
 

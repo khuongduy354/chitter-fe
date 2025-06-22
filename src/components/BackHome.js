@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { useContext } from "react";
-import { AppContext } from "../App";
+import { AppContext } from "../contexts/AppContext";
 
 export function BackHome() {
   const { setPanelMode } = useContext(AppContext);

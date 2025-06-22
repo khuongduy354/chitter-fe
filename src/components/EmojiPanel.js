@@ -2,7 +2,7 @@ import { Button, Divider } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { FileUploadComponent } from "./FileUpload";
 import { RESTQuery } from "../helper/restQuery";
-import { AppContext } from "../App";
+import { AppContext } from "../contexts/AppContext";
 
 export const EmojiPanel = () => {
   const { user, setPanelMode } = useContext(AppContext);

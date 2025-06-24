@@ -6,6 +6,7 @@ export const getSocket = () => {
     return socket;
   } else {
     socket = io(process.env.REACT_APP_WS_URL);
+
     return socket;
   }
 };

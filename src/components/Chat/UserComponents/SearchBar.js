@@ -2,27 +2,35 @@ import { useContext, useRef, useState } from "react";
 import { ChatContext } from "../Chat";
 import { RESTQuery } from "../../../helper/restQuery";
 import { info } from "../../../helper/info";
-import { Button, Divider } from "antd";
+import { Button, Input, List, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { AppContext } from "../../../contexts/AppContext";
 
 export const SearchBar = () => {
-  const { setCurrChatFriend } = useContext(ChatContext); // allow chatting stranger
+  const { setCurrChatFriend } = useContext(ChatContext);
   const { user } = useContext(AppContext);
 
   const searchRef = useRef(null);
   const [searchedUsers, setSearchedUsers] = useState([]);
+
   const searchHandler = async () => {
-    const newUser = await RESTQuery.searchFriend(searchRef.current.value);
+    const searchValue = searchRef.current.input.value;
+    if (!searchValue.trim()) {
+      info("Please enter a search term");
+      return;
+    }
+
+    const newUser = await RESTQuery.searchFriend(searchValue);
     if (newUser) {
       if (!searchedUsers.find((f) => f.id === newUser.id)) {
         setSearchedUsers([...searchedUsers, newUser]);
       }
     } else {
-      alert("No user found");
+      info("No user found");
     }
   };
+
   const addFriendRequest = async (friend) => {
-    // if (friends.find((f) => f.id === friend.id)) return;
     const isOk = await RESTQuery.sendFriendRequest(friend.id, user.accessToken);
     if (isOk) {
       info("Friend request sent");
@@ -30,33 +38,53 @@ export const SearchBar = () => {
       info("Friend request failed");
     }
   };
-  return (
-    <div>
-      <input
-        ref={searchRef}
-        type="text"
-        placeholder="Search Friend's email here"
-      />
-      <Button type="primary" onClick={searchHandler}>
-        Search
-      </Button>
 
-      {searchedUsers.length > 0 && <Divider>Search Results</Divider>}
-      <ul>
-        {searchedUsers &&
-          searchedUsers.map((friend) => {
-            return (
-              <li key={friend.id}>
-                {friend.email} - {friend.name}
-                <span> </span>
-                <Button onClick={() => setCurrChatFriend(friend)}>Chat</Button>
-                <Button onClick={() => addFriendRequest(friend)}>
-                  Request to add friend
-                </Button>
-              </li>
-            );
-          })}
-      </ul>
+  return (
+    <div style={{ padding: "0 1rem", marginBottom: "1rem" }}>
+      <Space.Compact style={{ width: "100%" }}>
+        <Input
+          ref={searchRef}
+          placeholder="Search user by email"
+          onPressEnter={searchHandler}
+        />
+        <Button
+          type="primary"
+          onClick={searchHandler}
+          icon={<SearchOutlined />}
+        >
+          Search
+        </Button>
+      </Space.Compact>
+
+      {searchedUsers.length > 0 && (
+        <List
+          style={{ marginTop: "1rem" }}
+          size="small"
+          dataSource={searchedUsers}
+          renderItem={(friend) => (
+            <List.Item
+              actions={[
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={() => setCurrChatFriend(friend)}
+                >
+                  Chat
+                </Button>,
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={() => addFriendRequest(friend)}
+                >
+                  Add Friend
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta title={friend.email} description={friend.name} />
+            </List.Item>
+          )}
+        />
+      )}
     </div>
   );
 };

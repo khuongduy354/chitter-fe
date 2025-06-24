@@ -1,7 +1,6 @@
 import { createContext, useState } from "react";
 import { Flex } from "antd";
 import { ChatPanel } from "./ChatPanel";
-import { UserPanel } from "./UserComponents/UserPanel";
 
 export const ChatContext = createContext({
   currChatFriend: null,
@@ -18,18 +17,8 @@ export const Chat = () => {
     <ChatContext.Provider
       value={{ currChatFriend, setCurrChatFriend, activeRoom, setActiveRoom }}
     >
-      <Flex vertical gap="middle" style={{ width: "100%" }}>
-        <Flex
-          justify="space-between"
-          wrap="wrap"
-          gap="small"
-          style={{ padding: "1rem" }}
-        >
-          <UserPanel />
-        </Flex>
-        <Flex justify="space-around" gap="large" style={{ padding: "1rem" }}>
-          <ChatPanel />
-        </Flex>
+      <Flex style={{ width: "100%", height: "100dvh", margin: 0, padding: 0 }}>
+        <ChatPanel />
       </Flex>
     </ChatContext.Provider>
   );

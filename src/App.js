@@ -31,8 +31,17 @@ function App() {
     }
 
     return (
-      <Flex vertical align="center" style={{ padding: "2rem" }}>
-        <Flex gap="small" style={{ marginBottom: "1rem" }}>
+      <Flex
+        vertical
+        align="center"
+        style={{
+          height: "100dvh",
+          margin: 0,
+          padding: 0,
+          overflow: "hidden",
+        }}
+      >
+        <Flex gap="small" style={{ padding: "0.5rem" }}>
           <Button onClick={() => setPanelMode("emoji")}>Emojis</Button>
           <Button onClick={() => setPanelMode("theme")}>Theme Edit</Button>
           <Button onClick={() => setPanelMode("market")}>Market</Button>
@@ -41,7 +50,13 @@ function App() {
             Sign Out
           </Button>
         </Flex>
-        <div style={{ width: "100%", maxWidth: "1200px" }}>
+        <div
+          style={{
+            width: "100%",
+            height: "calc(100% - 2.5rem)",
+            maxWidth: "1200px",
+          }}
+        >
           {panelMode === "chat" && <Chat />}
           {panelMode === "emoji" && <EmojiPanel />}
           {panelMode === "theme" && <ThemeEditor />}

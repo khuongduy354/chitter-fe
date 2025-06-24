@@ -1,4 +1,6 @@
 import { Flex, Input } from "antd";
+import { SearchBar } from "./SearchBar";
+import { FriendList } from "./FriendList";
 
 export const UserPanel = ({ username, setUserName }) => {
   return (
@@ -23,8 +25,8 @@ export const UserPanel = ({ username, setUserName }) => {
           style={{ width: "100%" }}
         />
       </Flex>
-      {/* <SearchBar /> */}
-      {/* <FriendList /> */}
+      <SearchBar />
+      <FriendList />
       {/* <GroupPanel /> */}
     </Flex>
   );
